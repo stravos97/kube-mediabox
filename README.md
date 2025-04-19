@@ -1,6 +1,6 @@
 # Kube-Mediabox: Your Personal Media Server on Kubernetes
 
-Welcome to Kube-Mediabox, a comprehensive solution for running your personal media server on Kubernetes. This project is a fork of [shapetheLOLa/kube-mediabox](https://github.com/shapetheLOLa/kube-mediabox), enhanced with updated chart versions, improved configurations, and expanded documentation. The original project provided the foundation for deploying media services on Kubernetes, and this fork builds upon that work with additional features and refinements.
+Welcome to Kube-Mediabox, a comprehensive solution for running your personal media server on Kubernetes. This project is a fork of [shapetheLOLa/kube-mediabox](https://github.com/shapetheLOLa/kube-mediabox), enhanced with updated chart versions, improved configurations, and expanded documentation. The original project provided the foundation for deploying media services on Kubernetes, and this fork builds upon that work with additional features and refinements.
 
 ## Project Origins and Enhancements
 
@@ -19,35 +19,35 @@ Kube-Mediabox creates a complete media management system using containerized app
 ### Core Components
 
 1. **Media Storage Layer**
-    
-    - A shared storage volume (PV/PVC) mounted at `/mnt/` holds all your media files
-    - Each service has its own configuration volume mounted at `/config/{servicename}`
-    - All services run with the same user permissions (UID/GID: 911) to ensure smooth file operations
+   - A shared storage volume (PV/PVC) mounted at `/mnt/` holds all your media files
+   - Each service has its own configuration volume mounted at `/config/{servicename}`
+   - All services run with the same user permissions (UID/GID: 911) to ensure smooth file operations
+
 2. **Download Management**
-    
-    - SABnzbd handles the actual downloading of content
-    - Downloads are saved directly to the shared storage volume
-    - The download location is accessible to other services through the shared mount
+   - SABnzbd handles the actual downloading of content
+   - Downloads are saved directly to the shared storage volume
+   - The download location is accessible to other services through the shared mount
+
 3. **Media Management**
-    
-    - Radarr manages your movie library:
-        - Monitors for new movies
-        - Sends download requests to SABnzbd
-        - Handles post-processing (renaming, moving files)
-    - Sonarr does the same for TV shows:
-        - Tracks TV series
-        - Manages episode downloads
-        - Organizes the TV library
+   - Radarr manages your movie library:
+     - Monitors for new movies
+     - Sends download requests to SABnzbd
+     - Handles post-processing (renaming, moving files)
+   
+   - Sonarr does the same for TV shows:
+     - Tracks TV series
+     - Manages episode downloads
+     - Organizes the TV library
+
 4. **Media Server**
-    
-    - Plex reads from the organized media library
-    - Handles transcoding when needed
-    - Streams content to users' devices
+   - Plex reads from the organized media library
+   - Handles transcoding when needed
+   - Streams content to users' devices
+
 5. **User Interface**
-    
-    - Heimdall provides a clean dashboard to access all services
-    - Ombi allows users to request new content
-    - Each service has its own web interface
+   - Heimdall provides a clean dashboard to access all services
+   - Ombi allows users to request new content
+   - Each service has its own web interface
 
 ### Data Flow
 
@@ -63,37 +63,36 @@ Kube-Mediabox creates a complete media management system using containerized app
 This project evolved through several phases, building upon the original kube-mediabox foundation:
 
 1. **Original Project (by shapetheLOLa)**
-    
-    - Initial implementation of core media services
-    - Basic Helm chart structure and configurations
-    - Foundation for service deployments
-    - Essential documentation and setup instructions
+   - Initial implementation of core media services
+   - Basic Helm chart structure and configurations
+   - Foundation for service deployments
+   - Essential documentation and setup instructions
+
 2. **Fork Enhancement Phase 1 (April 2025)**
-    
-    - Updated all Helm chart versions to latest stable releases
-    - Enhanced .gitignore patterns for Helm charts
-    - Added missing Helm chart dependencies
-    - Updated TrueCharts common library to version 25.4.10
+   - Updated all Helm chart versions to latest stable releases
+   - Enhanced .gitignore patterns for Helm charts
+   - Added missing Helm chart dependencies
+   - Updated TrueCharts common library to version 25.4.10
+
 3. **Fork Enhancement Phase 2 (April 2025)**
-    
-    - Modified service types from ClusterIP to LoadBalancer
-    - Updated ingress configurations for improved access
-    - Enhanced networking settings for all services
-    - Improved service connectivity and accessibility
+   - Modified service types from ClusterIP to LoadBalancer
+   - Updated ingress configurations for improved access
+   - Enhanced networking settings for all services
+   - Improved service connectivity and accessibility
+
 4. **Documentation Expansion**
-    
-    - Added detailed architecture diagrams
-    - Created comprehensive flow charts
-    - Expanded installation instructions
-    - Enhanced troubleshooting guides
-    - Added Longhorn storage option documentation
+   - Added detailed architecture diagrams
+   - Created comprehensive flow charts
+   - Expanded installation instructions
+   - Enhanced troubleshooting guides
+   - Added Longhorn storage option documentation
+
 5. **Future Plans**
-    
-    - Regular chart version updates
-    - Additional storage backend options
-    - Enhanced security configurations
-    - Improved backup solutions
-    - Extended monitoring capabilities
+   - Regular chart version updates
+   - Additional storage backend options
+   - Enhanced security configurations
+   - Improved backup solutions
+   - Extended monitoring capabilities
 
 ## What is Kube-Mediabox?
 
@@ -112,19 +111,36 @@ Each service in the stack has a specific role:
 
 ## Architecture
 
+The system can be configured to use either local storage or Longhorn distributed storage. Here's how it all fits together:
+
 ```mermaid
 graph TB
     subgraph "Kubernetes Cluster"
+        subgraph "Storage Layer"
+            L[Longhorn Storage System]
+            L --> |manages| V[(Volume Replicas)]
+            V --> |distributed across| N[Cluster Nodes]
+        end
+        
         subgraph "Media Node"
-            P[Plex] --> |reads| M[(Media Storage)]
+            P[Plex] --> |reads| M[Media Storage]
             S[SABnzbd] --> |writes| M
             R[Radarr] --> |manages movies| M
             SO[Sonarr] --> |manages TV shows| M
+            
+            subgraph "Configuration Storage"
+                L --> |provides| C1[Plex Config]
+                L --> |provides| C2[SABnzbd Config]
+                L --> |provides| C3[Radarr Config]
+                L --> |provides| C4[Sonarr Config]
+            end
         end
         
         subgraph "Services"
             H[Heimdall Dashboard]
             O[Ombi Requests]
+            L --> |provides| C5[Heimdall Config]
+            L --> |provides| C6[Ombi Config]
         end
         
         U[Users] --> |access| H
@@ -132,7 +148,40 @@ graph TB
         O --> |sends requests| R
         O --> |sends requests| SO
     end
+
+style L fill:#f96,stroke:#333,stroke-width:2px
+style V fill:#f96,stroke:#333,stroke-width:2px
 ```
+
+### Understanding Longhorn Storage
+
+Longhorn provides a robust distributed storage solution that enhances the reliability and flexibility of your media server setup. Here's what it brings to the system:
+
+1. **Distributed Storage Management**
+   - Automatically replicates data across multiple nodes
+   - Ensures high availability of your configuration files
+   - Allows services to run on any node in the cluster
+   - Manages storage volumes dynamically
+
+2. **Configuration Persistence**
+   - Each service gets its own persistent volume
+   - Configurations survive pod restarts and node failures
+   - Easy backup and restore capabilities
+   - Consistent storage across cluster updates
+
+3. **Benefits Over Local Storage**
+   - No need for manual node selection
+   - Better fault tolerance through replication
+   - Easier scaling and maintenance
+   - Built-in backup and disaster recovery
+
+4. **Volume Management**
+   - Creates independent volumes for each service
+   - Handles volume attachment and detachment
+   - Provides snapshot capabilities
+   - Offers monitoring and health checks
+
+When using Longhorn, your service configurations become more resilient and portable. Instead of being tied to a specific node's local storage, they can move freely within the cluster while maintaining their state and settings. This is particularly valuable for larger setups or environments where high availability is important.
 
 ## System Flow
 
@@ -162,15 +211,14 @@ Before you begin, make sure you have:
 You have two options for storing your configuration files:
 
 1. **Default Method**: Local hostPath on a selected node
-    
-    - Simpler setup
-    - Requires all services to run on the same node
-    - Good for home setups
+   - Simpler setup
+   - Requires all services to run on the same node
+   - Good for home setups
+
 2. **Longhorn Method**: Distributed storage
-    
-    - More flexible
-    - Better for larger setups
-    - Requires Longhorn installation
+   - More flexible
+   - Better for larger setups
+   - Requires Longhorn installation
 
 ## Installation Guide
 
@@ -192,7 +240,7 @@ helm upgrade --install media-pv-pvc ./media-pv-pvc
 
 ### 3. Install Services
 
-Install each service in the following order. Remember to replace `yourdomain.xyz` with your actual domain:
+Install each service in the following order. Remember to replace `yourdomain.xyz` with your actual domain:
 
 ```bash
 # Heimdall Dashboard
@@ -238,18 +286,15 @@ helm upgrade --install ombi ./ombi --set ingress.rules.host=ombi.yourdomain.xyz
 
 - All services run with UID and GID of 911
 - If you encounter permission issues, set the correct permissions before installing:
-    
-    ```bash
-    sudo chown -R 911:911 /path/to/your/config/directories
-    ```
-    
+  ```bash
+  sudo chown -R 911:911 /path/to/your/config/directories
+  ```
 
 ### Using Longhorn (Alternative Storage)
 
 If you prefer using Longhorn for storage:
 
 1. Install Longhorn:
-
 ```bash
 helm repo add longhorn https://charts.longhorn.io
 helm repo update
@@ -262,7 +307,7 @@ helm install longhorn longhorn/longhorn --namespace longhorn-system --create-nam
 
 ## Customization
 
-Each service's configuration can be customized through its respective `values.yaml` file. Common customizations include:
+Each service's configuration can be customized through its respective `values.yaml` file. Common customizations include:
 
 - Changing ports
 - Modifying resource limits
@@ -280,7 +325,6 @@ Common issues and solutions:
 ## Support and Community
 
 If you need help:
-
 - Check the individual service documentation
 - Review the TrueCharts documentation
 - File an issue on the project's GitHub repository
@@ -288,7 +332,6 @@ If you need help:
 ## Security Considerations
 
 Remember to:
-
 - Change default passwords
 - Use HTTPS for external access
 - Regularly update your services
