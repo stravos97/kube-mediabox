@@ -5,3 +5,7 @@
 /sabnzbd/.helmignore
 /sonarr/.helmignore
 /.idea/
+
+# Ignore downloaded Helm dependencies
+**/charts/
+**/Chart.lock
