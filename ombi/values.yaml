@@ -9,10 +9,10 @@ service:
   - port: 3579
     protocol: TCP
     targetPort: 3579
-  type: ClusterIP
+  type: LoadBalancer # Changed from ClusterIP
 ingress:
   rules:
-    host: ombi.yourservice.xyz
+    host: ombi.mediabox.local
     secretName: ombi-tls
     http:
       service:

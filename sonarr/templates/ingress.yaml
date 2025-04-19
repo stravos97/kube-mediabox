@@ -22,7 +22,3 @@ spec:
             port:
               number: 8989
         pathType: ImplementationSpecific
-  tls:
-  - hosts:
-    - {{ .Values.ingress.rules.host }} 
-    secretName: sonarr-tls

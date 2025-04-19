@@ -22,7 +22,3 @@ spec:
             port:
               number: 6969
         pathType: ImplementationSpecific
-  tls:
-  - hosts:
-    - {{ .Values.ingress.rules.host }}
-    secretName: {{ .Values.ingress.rules.secretName }}

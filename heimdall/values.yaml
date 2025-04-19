@@ -9,10 +9,10 @@ service:
   - port: 6969
     protocol: TCP
     targetPort: 80
-  type: ClusterIP
+  type: LoadBalancer # Changed from ClusterIP
 ingress:
   rules:
-    host: heimdall.yourservice.xyz
+    host: heimdall.mediabox.local
     secretName: heimdall-tls
     http:
       service:

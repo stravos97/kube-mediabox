@@ -16,7 +16,7 @@ service:
   - port: 8080
     protocol: TCP
     targetPort: 8080
-  type: ClusterIP
+  type: LoadBalancer # Changed from ClusterIP
 ingress:
   rules:
-    host: sabnzbd.yourservice.xyz
+    host: sabnzbd.mediabox.local
