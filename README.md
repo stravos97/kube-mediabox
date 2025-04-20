@@ -1,16 +1,18 @@
 # Kube-Mediabox: Your Personal Media Server on Kubernetes
 
-Welcome to Kube-Mediabox, a comprehensive solution for running your personal media server on Kubernetes. This project is a fork of [shapetheLOLa/kube-mediabox](https://github.com/shapetheLOLa/kube-mediabox), enhanced with updated chart versions, improved configurations, and expanded documentation. The original project provided the foundation for deploying media services on Kubernetes, and this fork builds upon that work with additional features and refinements.
+Welcome to Kube-Mediabox, a comprehensive solution for running your personal media server on Kubernetes using Longhorn distributed storage. This project is a fork of [shapetheLOLa/kube-mediabox](https://github.com/shapetheLOLa/kube-mediabox), enhanced with updated chart versions, improved configurations, and a robust distributed storage architecture. While the original project provided the foundation for deploying media services on Kubernetes, this fork standardizes on Longhorn for reliable storage management and adds several key improvements.
 
-## Project Origins and Enhancements
+## Project Architecture
+
+Kube-Mediabox combines popular media services with Longhorn's distributed storage system to create a reliable and scalable media server. The architecture ensures your media files and service configurations are safely replicated across your cluster, providing both redundancy and ease of management.
 
 This fork builds upon the original work by shapetheLOLa, adding several improvements:
 
 1. Updated Helm chart versions and dependencies for all services
 2. Enhanced service configurations, particularly for ingress
 3. Changed service types to LoadBalancer for improved accessibility
-4. Expanded documentation and architecture diagrams
-5. Additional deployment options including Longhorn storage support
+4. Standardized on Longhorn for reliable distributed storage
+5. Expanded documentation and architecture diagrams
 
 ## How It Works
 
@@ -68,31 +70,30 @@ This project evolved through several phases, building upon the original kube-med
    - Foundation for service deployments
    - Essential documentation and setup instructions
 
-2. **Fork Enhancement Phase 1 (April 2025)**
-   - Updated all Helm chart versions to latest stable releases
-   - Enhanced .gitignore patterns for Helm charts
-   - Added missing Helm chart dependencies
-   - Updated TrueCharts common library to version 25.4.10
+2. **Storage Architecture Redesign (April 2025)**
+   - Implemented Longhorn as the standard storage solution
+   - Removed local storage dependencies
+   - Created distributed storage architecture
+   - Enhanced volume management and replication
 
-3. **Fork Enhancement Phase 2 (April 2025)**
-   - Modified service types from ClusterIP to LoadBalancer
-   - Updated ingress configurations for improved access
-   - Enhanced networking settings for all services
-   - Improved service connectivity and accessibility
+3. **Service Enhancements (April 2025)**
+   - Updated all Helm chart versions to latest stable releases
+   - Modified service types to LoadBalancer
+   - Updated ingress configurations
+   - Improved service connectivity
 
 4. **Documentation Expansion**
    - Added detailed architecture diagrams
    - Created comprehensive flow charts
    - Expanded installation instructions
    - Enhanced troubleshooting guides
-   - Added Longhorn storage option documentation
+   - Added detailed Longhorn configuration guides
 
 5. **Future Plans**
    - Regular chart version updates
-   - Additional storage backend options
-   - Enhanced security configurations
-   - Improved backup solutions
-   - Extended monitoring capabilities
+   - Enhanced backup solutions
+   - Improved monitoring capabilities
+   - Advanced Longhorn integration features
 
 ## What is Kube-Mediabox?
 
@@ -206,19 +207,40 @@ Before you begin, make sure you have:
 3. Storage space for your media files
 4. A node labeled for mediabox (we'll show you how to do this)
 
-## Storage Configuration
+# Storage Configuration
 
-You have two options for storing your configuration files:
+This project uses Longhorn for distributed storage management. Longhorn provides a robust and reliable way to handle persistent storage in your Kubernetes cluster, ensuring your media server's data and configurations are safely managed and replicated.
 
-1. **Default Method**: Local hostPath on a selected node
-   - Simpler setup
-   - Requires all services to run on the same node
-   - Good for home setups
+Understanding how Longhorn works in our setup will help you get the most out of your media server. When you deploy a service like Radarr or Sonarr, Longhorn automatically creates and manages a persistent volume for that service's configuration. These volumes are replicated across your cluster nodes, providing redundancy and protection against node failures.
 
-2. **Longhorn Method**: Distributed storage
-   - More flexible
-   - Better for larger setups
-   - Requires Longhorn installation
+Let's walk through setting up Longhorn for your media server:
+
+1. First, install Longhorn in your cluster:
+```bash
+helm repo add longhorn https://charts.longhorn.io
+helm repo update
+helm install longhorn longhorn/longhorn --namespace longhorn-system --create-namespace
+```
+
+2. Once Longhorn is installed, access the Longhorn UI through its service. You'll use this interface to:
+   - Monitor your storage resources
+   - Create and manage volumes
+   - Configure backup settings
+   - Check volume health and replication status
+
+3. Create the following volumes through the Longhorn UI:
+   - plex-config
+   - radarr-config
+   - sonarr-config
+   - sabnzbd-config
+   - heimdall-config
+   - ombi-config
+
+Each volume will store its respective service's configuration data. The services are already configured to look for these volume names, so once they're created, everything will connect automatically.
+
+For your media storage, create a separate volume called 'media-storage'. This volume will hold all your media files and should be sized according to your needs. The media-storage volume will be mounted to your services at `/mnt/`, allowing them to share access to your media library.
+
+Remember to configure your volume replicas based on your cluster size. For most home setups, 2 replicas provide a good balance of redundancy and resource usage.
 
 ## Installation Guide
 
@@ -316,18 +338,81 @@ Each service's configuration can be customized through its respective `values.ya
 
 ## Troubleshooting
 
-Common issues and solutions:
+When running into issues, here are some common solutions:
 
-1. **Permission Denied**: Check that the UID/GID settings match (should be 911)
-2. **Cannot Find Media**: Verify mount paths in the StatefulSet configurations
-3. **Services Not Starting**: Check node labels and ensure services are scheduled on the correct node
+### Volume Issues
+
+If you experience problems with Longhorn volumes:
+
+1. Check the volume state in the Longhorn UI:
+   - Ensure all replicas are healthy
+   - Verify the volume is attached to the correct node
+   - Check available storage space on your nodes
+
+2. If a volume is degraded:
+   - Wait for rebuilding to complete
+   - Check node connectivity
+   - Verify disk space on replica nodes
+
+3. For slow performance:
+   - Check network connectivity between nodes
+   - Verify your storage network configuration
+   - Consider adjusting the number of replicas
+
+### Service Configuration
+
+When services aren't working as expected:
+
+1. Verify volume mounts:
+```bash
+kubectl describe pod [pod-name]
+```
+Look for successful volume mounts in the events section.
+
+2. Check service logs:
+```bash
+kubectl logs [pod-name]
+```
+Watch for permission issues or connection errors.
+
+3. Verify service connectivity:
+```bash
+kubectl get svc
+```
+Ensure services are properly exposed.
+
+### Performance Optimization
+
+To improve system performance:
+
+1. Configure Longhorn settings:
+   - Adjust replica count based on your cluster size
+   - Set appropriate storage overprovisioning
+   - Configure backup schedules during off-peak hours
+
+2. Resource allocation:
+   - Monitor CPU and memory usage
+   - Adjust resource limits in service configurations
+   - Consider node capacity when placing replicas
 
 ## Support and Community
 
-If you need help:
-- Check the individual service documentation
-- Review the TrueCharts documentation
-- File an issue on the project's GitHub repository
+For assistance with:
+
+1. Longhorn issues:
+   - Visit the [Longhorn documentation](https://longhorn.io/docs/)
+   - Check the [Longhorn GitHub issues](https://github.com/longhorn/longhorn/issues)
+   - Join the Longhorn Slack channel
+
+2. Media services:
+   - Reference individual service documentation
+   - Check service-specific forums
+   - Review TrueCharts documentation
+
+3. This project:
+   - Create an issue in the GitHub repository
+   - Check existing issues for solutions
+   - Contribute improvements via pull requests
 
 ## Security Considerations
 
