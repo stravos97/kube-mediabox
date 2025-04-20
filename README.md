@@ -312,20 +312,7 @@ helm upgrade --install ombi ./ombi --set ingress.rules.host=ombi.yourdomain.xyz
   sudo chown -R 911:911 /path/to/your/config/directories
   ```
 
-### Using Longhorn (Alternative Storage)
 
-If you prefer using Longhorn for storage:
-
-1. Install Longhorn:
-```bash
-helm repo add longhorn https://charts.longhorn.io
-helm repo update
-helm install longhorn longhorn/longhorn --namespace longhorn-system --create-namespace
-```
-
-2. Create disk space on your nodes in the Longhorn UI
-3. Create volumes for each service (e.g., radarr-config, sonarr-config)
-4. Configure the volumes through the Longhorn UI
 
 ## Customization
 
