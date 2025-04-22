@@ -12,6 +12,8 @@ spec:
   selector:
     # Selects the pods based on the label found in the StatefulSet
     name: plex-server
+    app.kubernetes.io/instance: plex
+    app.kubernetes.io/name: plex
   ports:
     - name: plex-main
       protocol: TCP

@@ -7,7 +7,8 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   selector:
-    app: {{ .Chart.Name }}
-  {{- include "helm-starter-chart.selectorLabels" . | nindent 4 }}
+    app: qbittorrent
+    app.kubernetes.io/instance: qbittorrent
+    app.kubernetes.io/name: qbittorrent
   ports:
   {{- .Values.service.ports | toYaml | nindent 2 -}}
