@@ -40,6 +40,8 @@ spec:
             port: 32400
         name: plex-server
         resources: {}
+        securityContext:
+          privileged: true
         volumeMounts:
         - mountPath: /config
           name: plex-config

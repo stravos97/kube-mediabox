@@ -42,9 +42,9 @@ service:
   # Service ports now target the Gluetun sidecar, which forwards them
   ports:
   - name: webui
-    port: 8080 # qBittorrent Web UI port (exposed externally)
+    port: 8081 # qBittorrent Web UI port (exposed externally)
     protocol: TCP
-    targetPort: 8080 # Target port on the Gluetun sidecar (which forwards to qBittorrent)
+    targetPort: 8081 # Target port on the Gluetun sidecar (which forwards to qBittorrent)
   - name: torrent-tcp
     port: 6883 # qBittorrent torrent traffic port (exposed externally)
     protocol: TCP

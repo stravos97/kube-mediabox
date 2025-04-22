@@ -22,6 +22,9 @@ spec:
       # qBittorrent container - uses network from Gluetun sidecar
       - image: {{ .Values.statefulset.qbittorrent.image.repository }}:{{ .Values.statefulset.qbittorrent.image.tag | default .Chart.AppVersion }}
         name: {{ .Chart.Name }}
+        env:
+        - name: WEBUI_PORT
+          value: "8081" # Set the WebUI port via environment variable
         # Ports are handled by the Gluetun sidecar
         volumeMounts:
         - mountPath: /config
@@ -39,7 +42,7 @@ spec:
             add: ["NET_ADMIN"]
         ports:
           # Ports exposed by Gluetun, matching the service definition
-          - containerPort: 8080 # qBittorrent WebUI forwarded by Gluetun
+          - containerPort: 8081 # qBittorrent WebUI forwarded by Gluetun
             name: webui
           - containerPort: 6881 # qBittorrent torrent TCP forwarded by Gluetun
             protocol: TCP

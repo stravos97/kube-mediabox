@@ -13,9 +13,9 @@ statefulset:
         memory: 2G
 service:
   ports:
-  - port: 5052
+  - port: 8080
     protocol: TCP
-    targetPort: 5052
+    targetPort: 8080
   type: LoadBalancer # Changed from ClusterIP
 ingress:
   rules:
