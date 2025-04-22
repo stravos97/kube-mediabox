@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "lidarr.fullname" . }}-statefulset # Match Sonarr naming
+  labels:
+    app: lidarr # Add consistent app label
+    {{- include "lidarr.labels" . | nindent 4 }}
+spec:
+  serviceName: lidarr-service # Match Sonarr naming
+  replicas: {{ .Values.statefulset.replicas }} # Use new values path
+  selector:
+    matchLabels:
+      app: lidarr # Add consistent app label
+      {{- include "lidarr.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      # Remove podAnnotations block if not used in Sonarr/Radarr values
+      labels:
+        app: lidarr # Add consistent app label
+        {{- include "lidarr.selectorLabels" . | nindent 8 }}
+        # Remove podLabels block if not used in Sonarr/Radarr values
+    spec:
+      # Remove imagePullSecrets block if not used in Sonarr/Radarr values
+      # Remove serviceAccountName line
+      # Remove podSecurityContext block if not used in Sonarr/Radarr values
+      securityContext: # Add top-level securityContext if needed, or remove
+        {}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          # Remove inner securityContext block if not used in Sonarr/Radarr values
+          image: "{{ .Values.statefulset.lidarr.image.repository }}:{{ .Values.statefulset.lidarr.image.tag | default .Chart.AppVersion }}" # Use new values path
+          # Remove imagePullPolicy line
+          env: # Keep environment variables
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Etc/UTC"
+          ports:
+            - name: http # Keep name consistent? Sonarr uses 'sonarr'
+              containerPort: 8686 # Use direct port number
+              protocol: TCP
+          # Remove livenessProbe block
+          # Remove readinessProbe block
+          # Remove resources block
+          volumeMounts: # Keep volumeMounts
+            - name: config # Mount for the config PVC template
+              mountPath: /config
+            - name: shared-data # Mount for the shared media/downloads volume
+              mountPath: /music
+              subPath: music # Assumes 'music' subfolder in shared volume
+            - name: shared-data # Mount for the shared media/downloads volume
+              mountPath: /downloads
+              subPath: downloads # Assumes 'downloads' subfolder in shared volume
+      volumes: # Replaced volumes section to use existing shared PVC
+        - name: shared-data # Name referenced by volumeMounts
+          persistentVolumeClaim:
+            claimName: media-pv-pvc-claim # Existing shared PVC name
+      {{- with .Values.statefulset.lidarr.nodeSelector }} # Use new values path
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      # Remove affinity block
+      # Remove tolerations block
+  volumeClaimTemplates: # Keep volumeClaimTemplates
+    - metadata:
+        name: config # Name referenced by volumeMounts
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: longhorn # Specify your Longhorn storage class
+        resources:
+          requests:
+            storage: 5Gi # Adjust size as needed

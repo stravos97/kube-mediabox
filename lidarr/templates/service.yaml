@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: lidarr-service # Match Sonarr naming
+  labels:
+    app: lidarr # Add consistent app label
+    {{- include "lidarr.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }} # Use new values path
+  ports:
+    {{- range .Values.service.ports }} # Iterate over ports list
+    - port: {{ .port }}
+      targetPort: {{ .targetPort }}
+      protocol: {{ .protocol }}
+      name: http # Keep name or make consistent? Sonarr uses 'sonarr'
+    {{- end }}
+  selector:
+    app: lidarr # Add consistent app label
+    {{- include "lidarr.selectorLabels" . | nindent 4 }}

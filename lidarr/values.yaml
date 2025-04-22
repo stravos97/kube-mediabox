@@ -1,0 +1,19 @@
+statefulset:
+  lidarr: # App-specific key
+    nodeSelector: # Adding for consistency, assuming same node selection
+      app: mediabox
+    image:
+      repository: lscr.io/linuxserver/lidarr # Keep updated value
+      tag: latest # Keep updated value
+    # resources: {} # Can add later if needed
+  replicas: 1
+service:
+  ports:
+  - port: 8686 # Keep updated value
+    protocol: TCP
+    targetPort: 8686 # Add targetPort for clarity
+  type: LoadBalancer # Keep updated value
+ingress: # Add for consistency
+  enabled: false # Default to false, can be overridden
+  rules:
+    host: lidarr.mediabox.local # Define the ingress host
