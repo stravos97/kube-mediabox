@@ -1,0 +1,38 @@
+statefulset:
+  gluetun: # Renamed from 'app' to 'gluetun'
+    nodeSelector:
+      app: mediabox
+    image:
+      repository: "qmcgaw/gluetun"
+      tag: latest
+    # Environment variables for Gluetun configuration
+    env:
+      VPN_SERVICE_PROVIDER: nordvpn
+      VPN_TYPE: wireguard
+      SERVER_REGIONS: Europe
+      SERVER_CATEGORIES: "Standard VPN servers,P2P"
+      TZ: Europe/London
+      UPDATER_PERIOD: 24h
+      UPDATER_VPN_SERVICE_PROVIDERS: nordvpn
+    # Secret reference for sensitive data
+    secrets:
+      existingSecret: gluetun-wireguard-secret # This secret should be created separately
+    # Security context for network capabilities
+    securityContext:
+      capabilities:
+        add: ["NET_ADMIN"]
+  replicas: 1
+persistentVolumeClaim:
+  storage: 1Gi # Reduced size as Gluetun config is small
+  storageClass: longhorn
+service:
+  ports:
+  - port: 8888 # Gluetun UI port
+    protocol: TCP
+    targetPort: 8888
+    name: http-ui
+  type: LoadBalancer
+ingress:
+  enabled: false
+  rules:
+    host: gluetun.mediabox.local

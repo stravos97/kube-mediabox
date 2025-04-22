@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "gluetun.fullname" . }}-statefulset
+  labels:
+    app: {{ .Chart.Name }}
+  {{- include "gluetun.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.statefulset.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+      {{- include "gluetun.selectorLabels" . | nindent 6 }}
+  serviceName: {{ .Chart.Name }}-service
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+        {{- include "gluetun.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - image: {{ .Values.statefulset.gluetun.image.repository }}:{{ .Values.statefulset.gluetun.image.tag | default .Chart.AppVersion }}
+        name: {{ .Chart.Name }}
+        securityContext:
+          capabilities:
+            add: ["NET_ADMIN"]
+        ports:
+        - containerPort: 8888
+          name: {{ .Chart.Name }}
+        env:
+        {{- range $key, $value := .Values.statefulset.gluetun.env }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+        {{- if .Values.statefulset.gluetun.secrets.existingSecret }}
+        envFrom:
+        - secretRef:
+            name: {{ .Values.statefulset.gluetun.secrets.existingSecret }}
+        {{- end }}
+        volumeMounts:
+        - mountPath: /config
+          name: {{ .Chart.Name }}-config
+      nodeSelector:
+        app: {{ .Values.statefulset.gluetun.nodeSelector.app }}
+      terminationGracePeriodSeconds: 10
+      volumes:
+      - name: {{ .Chart.Name }}-config
+        persistentVolumeClaim:
+           claimName: {{ .Chart.Name }}-config
