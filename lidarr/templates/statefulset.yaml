@@ -23,9 +23,7 @@ spec:
       # Remove imagePullSecrets block if not used in Sonarr/Radarr values
       # Remove serviceAccountName line
       # Remove podSecurityContext block if not used in Sonarr/Radarr values
-      securityContext: # Add top-level securityContext if needed, or remove
-        {}
-      {{- end }}
+      # Removed securityContext: {} block
       containers:
         - name: {{ .Chart.Name }}
           # Remove inner securityContext block if not used in Sonarr/Radarr values

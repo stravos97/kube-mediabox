@@ -10,8 +10,7 @@ metadata:
   annotations: # Keep annotations block for flexibility
     {{- with .Values.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
-    {{- end }}
-  {{- end }}
+    {{- end }} # Re-added necessary end for 'with' block
 spec:
   # Remove ingressClassName block if not used in Sonarr/Radarr values
   # Remove tls block if not used in Sonarr/Radarr values
