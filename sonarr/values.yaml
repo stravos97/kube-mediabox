@@ -18,7 +18,7 @@ service:
   - port: 8989
     protocol: TCP
     targetPort: 8989
-  type: LoadBalancer # Changed from ClusterIP
+  type: ClusterIP
 ingress:
   rules:
     host: sonarr.mediabox.local

@@ -11,7 +11,7 @@ service:
   - port: 7878
     protocol: TCP
     targetPort: 7878
-  type: LoadBalancer # Changed from ClusterIP
+  type: ClusterIP
 ingress:
   rules:
     host: radarr.mediabox.local

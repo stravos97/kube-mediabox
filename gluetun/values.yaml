@@ -47,7 +47,7 @@ service:
     protocol: UDP
     targetPort: 6881
     name: qbt-udp
-  type: LoadBalancer
+  type: ClusterIP
 ingress:
   enabled: false
   rules:

@@ -11,5 +11,5 @@ spec:
   - ReadWriteMany  # Allows mounting by multiple pods simultaneously
   resources:
     requests:
-      storage: 400Gi
+      storage: 5Gi
   storageClassName: longhorn-media

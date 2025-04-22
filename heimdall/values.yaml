@@ -9,7 +9,7 @@ service:
   - port: 6969
     protocol: TCP
     targetPort: 80
-  type: LoadBalancer # Changed from ClusterIP
+  type: ClusterIP
 ingress:
   rules:
     host: heimdall.mediabox.local

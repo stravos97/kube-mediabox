@@ -5,10 +5,9 @@ metadata:
   labels:
   {{- include "plex.labels" . | nindent 4 }}
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   # Use Local policy to preserve source IP and ensure traffic goes to a node with the pod
   # Important when using hostNetwork: true
-  externalTrafficPolicy: Local
   selector:
     # Selects the pods based on the label found in the StatefulSet
     name: plex-server

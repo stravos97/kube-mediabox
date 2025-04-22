@@ -58,7 +58,7 @@ service:
   #   port: 1080
   #   protocol: TCP
   #   targetPort: 1080
-  type: LoadBalancer
+  type: ClusterIP
 
 ingress:
   enabled: false
