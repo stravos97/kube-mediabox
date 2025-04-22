@@ -1,0 +1,17 @@
+apiVersion: v2
+name: helm-starter-chart
+description: A Helm starter chart for deploying applications with StatefulSet, Longhorn config, shared PVC, and LoadBalancer service.
+type: application # Indicates this chart deploys an application
+version: 0.1.0 # Initial version
+appVersion: "1.0.0" # Default application version (can be overridden)
+
+# Optional: Add keywords for discoverability
+# keywords:
+#   - statefulset
+#   - longhorn
+#   - media
+
+# Optional: Maintainer information
+# maintainers:
+#   - name: Your Name
+#     email: your.email@example.com
