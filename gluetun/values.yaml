@@ -14,6 +14,10 @@ statefulset:
       TZ: Europe/London
       UPDATER_PERIOD: 24h
       UPDATER_VPN_SERVICE_PROVIDERS: nordvpn
+      # Enable SOCKS5 proxy
+      DOT_SOCKS_ENABLED: "on"
+      # Allow incoming connections on qBittorrent port through VPN
+      FIREWALL_VPN_INPUT_PORTS: "6881"
     # Secret reference for sensitive data
     secrets:
       existingSecret: gluetun-wireguard-secret # This secret should be created separately
@@ -31,6 +35,18 @@ service:
     protocol: TCP
     targetPort: 8888
     name: http-ui
+  - port: 1080 # SOCKS5 proxy port
+    protocol: TCP
+    targetPort: 1080
+    name: socks5
+  - port: 6881 # qBittorrent torrenting port (TCP)
+    protocol: TCP
+    targetPort: 6881
+    name: qbt-tcp
+  - port: 6881 # qBittorrent torrenting port (UDP)
+    protocol: UDP
+    targetPort: 6881
+    name: qbt-udp
   type: LoadBalancer
 ingress:
   enabled: false

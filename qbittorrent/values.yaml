@@ -1,0 +1,66 @@
+statefulset:
+  qbittorrent: # App-specific key for qBittorrent
+    nodeSelector:
+      app: mediabox
+    image:
+      repository: "linuxserver/qbittorrent"
+      tag: latest
+  replicas: 1
+
+  # Configuration for the Gluetun sidecar container
+  gluetunSidecar:
+    enabled: true # Enable the sidecar
+    image:
+      repository: "qmcgaw/gluetun"
+      tag: latest
+    # Environment variables for Gluetun configuration (copied from standalone gluetun chart)
+    env:
+      VPN_SERVICE_PROVIDER: nordvpn
+      VPN_TYPE: wireguard
+      SERVER_REGIONS: Europe
+      SERVER_CATEGORIES: "Standard VPN servers,P2P"
+      TZ: Europe/London
+      UPDATER_PERIOD: 24h
+      UPDATER_VPN_SERVICE_PROVIDERS: nordvpn
+      # Enable SOCKS5 proxy (optional, but good practice)
+      DOT_SOCKS_ENABLED: "on"
+      # Allow incoming connections on qBittorrent ports through VPN
+      FIREWALL_VPN_INPUT_PORTS: "6883,6882"
+    # Secret reference for sensitive data (ensure this secret exists)
+    secrets:
+      existingSecret: gluetun-wireguard-secret
+    # Security context for network capabilities
+    securityContext:
+      capabilities:
+        add: ["NET_ADMIN"]
+
+persistentVolumeClaim:
+  storage: 2Gi
+  storageClass: longhorn
+
+service:
+  # Service ports now target the Gluetun sidecar, which forwards them
+  ports:
+  - name: webui
+    port: 8080 # qBittorrent Web UI port (exposed externally)
+    protocol: TCP
+    targetPort: 8080 # Target port on the Gluetun sidecar (which forwards to qBittorrent)
+  - name: torrent-tcp
+    port: 6883 # qBittorrent torrent traffic port (exposed externally)
+    protocol: TCP
+    targetPort: 6881 # Target port on the Gluetun sidecar
+  - name: torrent-udp
+    port: 6882 # qBittorrent torrent traffic port (exposed externally)
+    protocol: UDP
+    targetPort: 6881 # Target port on the Gluetun sidecar
+  # Add SOCKS5 proxy port if needed externally
+  # - name: socks5
+  #   port: 1080
+  #   protocol: TCP
+  #   targetPort: 1080
+  type: LoadBalancer
+
+ingress:
+  enabled: false
+  rules:
+    host: qbittorrent.mediabox.local # Default host for qBittorrent

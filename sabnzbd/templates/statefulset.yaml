@@ -22,7 +22,7 @@ spec:
       - image: linuxserver/sabnzbd:latest
         name: sabnzbd
         ports:
-        - containerPort: 8080
+        - containerPort: {{ (first .Values.service.ports).targetPort }}
           name: sabnzbd
         volumeMounts:
         - mountPath: /config
