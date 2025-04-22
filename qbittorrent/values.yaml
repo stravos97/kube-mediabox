@@ -1,3 +1,5 @@
+appName: qbittorrent # Define appName for helper templates
+
 statefulset:
   qbittorrent: # App-specific key for qBittorrent
     nodeSelector:
@@ -61,6 +63,6 @@ service:
   type: ClusterIP
 
 ingress:
-  enabled: false
+  enabled: true # <-- Enable the ingress
   rules:
     host: qbittorrent.mediabox.local # Default host for qBittorrent

@@ -3,9 +3,17 @@ statefulset:
     nodeSelector:
       app: mediabox
     image:
-      repository: linuxserver/radarr
+      repository: lscr.io/linuxserver/radarr # Updated repository
       tag: latest
+    env: # Add environment variables section
+      PUID: "1000"
+      PGID: "1000"
+      TZ: "Europe/London" # Example Timezone, adjust if needed
   replicas: 1
+
+persistentVolumeClaim: # Add PVC section
+  storageClass: "longhorn-static" # Match existing PVC
+
 service:
   ports:
   - port: 7878
@@ -13,5 +21,6 @@ service:
     targetPort: 7878
   type: ClusterIP
 ingress:
+  enabled: true # Enable ingress
   rules:
     host: radarr.mediabox.local

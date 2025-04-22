@@ -3,22 +3,19 @@ kind: Ingress
 metadata:
   name: {{ include "heimdall.fullname" . }}-ingress
   labels:
-  {{- include "heimdall.labels" . | nindent 4 }}
+    {{- include "heimdall.labels" . | nindent 4 }}
   annotations:
     cert-manager.io/issuer: letsencrypt-prod
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/proxy-body-size: 16m
-    nginx.org/client-max-body-size: "0"
-    nginx.org/proxy-connect-timeout: 600s
-    nginx.org/proxy-read-timeout: 600s
+    kubernetes.io/ingress.class: traefik
 spec:
+  ingressClassName: traefik
   rules:
-  - host: {{ .Values.ingress.rules.host }}
-    http:
-      paths:
-      - backend:
-          service:
-            name: {{ .Values.ingress.rules.http.service.name }} 
-            port:
-              number: 6969
-        pathType: ImplementationSpecific
+    - host: {{ .Values.ingress.rules.host }}
+      http:
+        paths:
+          - backend:
+              service:
+                name: {{ .Values.ingress.rules.http.service.name }}
+                port:
+                  number: 6969
+            pathType: ImplementationSpecific
