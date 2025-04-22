@@ -1,28 +1,24 @@
-{{- if .Values.ingress.enabled -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "lidarr.fullname" . }}-ingress # Match Sonarr naming convention
+  name: {{ include "lidarr.fullname" . }}-ingress
   labels:
-    app: lidarr # Add consistent app label
-    {{- include "lidarr.labels" . | nindent 4 }}
-  # Remove annotations block if not used in Sonarr/Radarr values
-  annotations: # Keep annotations block for flexibility
-    {{- with .Values.ingress.annotations }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }} # Re-added necessary end for 'with' block
+  {{- include "lidarr.labels" . | nindent 4 }}
+  annotations:
+    cert-manager.io/issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-body-size: 16m
+    nginx.org/client-max-body-size: "0"
+    nginx.org/proxy-connect-timeout: 600s
+    nginx.org/proxy-read-timeout: 600s
 spec:
-  # Remove ingressClassName block if not used in Sonarr/Radarr values
-  # Remove tls block if not used in Sonarr/Radarr values
   rules:
-    - host: {{ .Values.ingress.rules.host }} # Use new values path
-      http:
-        paths:
-          - path: / # Assume root path like Sonarr/Radarr
-            pathType: Prefix # Assume Prefix like Sonarr/Radarr
-            backend:
-              service:
-                name: lidarr-service # Use updated service name
-                port:
-                  number: 8686 # Use direct port number
-{{- end }}
+  - host: {{ .Values.ingress.rules.host }} 
+    http:
+      paths:
+      - backend:
+          service:
+            name: lidarr-service
+            port:
+              number: 8686
+        pathType: ImplementationSpecific

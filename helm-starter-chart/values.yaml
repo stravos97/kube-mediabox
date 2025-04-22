@@ -1,106 +1,18 @@
-# Default values for helm-starter-chart.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
-# -- REQUIRED: The base name for the application and related resources.
-# Example: my-cool-app
-appName: ""
-
-# -- REQUIRED: Image configuration
-image:
-  # -- REQUIRED: The repository for the application image.
-  repository: ""
-  # -- Image pull policy
-  pullPolicy: IfNotPresent
-  # -- REQUIRED: Overrides the image tag whose default is the chart appVersion.
-  tag: ""
-
-# -- Number of replicas for the StatefulSet.
-replicaCount: 1
-
-# -- Service configuration
+statefulset:
+  app: # App-specific key, replace 'app' with the actual app name when using this chart
+    nodeSelector:
+      app: mediabox
+    image:
+      repository: ""
+      tag: latest
+  replicas: 1
 service:
-  # -- Kubernetes Service type (e.g., ClusterIP, NodePort, LoadBalancer)
-  type: LoadBalancer
-  # -- List of ports exposed by the Service.
   ports:
-    - name: http # A descriptive name for the port
-      port: 8080 # The port the Service listens on
-      targetPort: 8080 # The port the container listens on
-      protocol: TCP # The protocol (TCP or UDP)
-
-# -- Persistence configuration
-persistence:
-  # -- Configuration for the dedicated config volume (created via VolumeClaimTemplate)
-  config:
-    # -- Enable the config volume
-    enabled: true
-    # -- StorageClass for the config volume. If set to "-", storageClassName is omitted.
-    # If set to "", the default StorageClass is used.
-    storageClassName: longhorn
-    # -- Access modes for the config volume
-    accessModes:
-      - ReadWriteOnce
-    # -- Size of the config volume
-    size: 5Gi
-    # -- Mount path inside the container for the config volume
-    mountPath: /config
-
-  # -- Configuration for mounting existing shared PersistentVolumeClaims
-  # Add more entries to this list to mount multiple shared volumes.
-  shared:
-    # - name: data # REQUIRED: A unique name for this shared volume mount
-    #   enabled: true # Enable this shared volume mount
-    #   # -- REQUIRED: The name of the existing PersistentVolumeClaim to mount.
-    #   existingClaim: ""
-    #   # -- REQUIRED: The path where the volume should be mounted inside the container.
-    #   mountPath: ""
-    #   # -- Optional: Mount a sub-path of the volume instead of its root.
-    #   subPath: ""
-    #   # -- Optional: Mount the volume read-only.
-    #   readOnly: false
-
-# -- Environment variables to set in the container.
-# Default PUID/PGID/TZ are common for linuxserver.io images, adjust as needed.
-env:
-  PUID: "1000"
-  PGID: "1000"
-  TZ: "Etc/UTC"
-  # Add more environment variables here as key-value pairs
-  # MY_VAR: "my-value"
-
-# -- Ingress configuration (optional)
+  - port: 8080 # Default port, should be updated for specific app
+    protocol: TCP
+    targetPort: 8080 # Should match the port value
+  type: LoadBalancer
 ingress:
-  # -- Enable Ingress resource
   enabled: false
-  # -- Optional: Specify IngressClass name
-  className: ""
-  # -- Optional: Annotations for the Ingress resource
-  # annotations: {}
-  #   kubernetes.io/ingress.class: nginx
-  #   kubernetes.io/tls-acme: "true"
-  # -- List of hosts for the Ingress resource
-  hosts:
-    # - host: chart-example.local
-    #   paths:
-    #     - path: /
-    #       pathType: ImplementationSpecific # Or Prefix, Exact
-            # backend: # Optional: Define backend explicitly if needed, otherwise uses serviceName/servicePort
-            #   service:
-            #     name: service-name # Usually derived
-            #     port:
-            #       number: 80 # Usually derived
-  # -- TLS configuration for Ingress
-  # tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
-
-# -- Optional: Node selector constraints
-nodeSelector: {}
-
-# -- Optional: Tolerations for pod assignment
-tolerations: []
-
-# -- Optional: Affinity rules for pod assignment
-affinity: {}
+  rules:
+    host: app.mediabox.local # Default host, should be updated for specific app

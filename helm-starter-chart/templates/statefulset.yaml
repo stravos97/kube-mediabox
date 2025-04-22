@@ -1,126 +1,41 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "helm-starter-chart.fullname" . }}
+  name: {{ include "helm-starter-chart.fullname" . }}-statefulset
   labels:
-    {{- include "helm-starter-chart.labels" . | nindent 4 }}
+    app: {{ .Chart.Name }}
+  {{- include "helm-starter-chart.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.statefulset.replicas }}
   selector:
     matchLabels:
+      app: {{ .Chart.Name }}
       {{- include "helm-starter-chart.selectorLabels" . | nindent 6 }}
-  # Service name must match the service created for headless StatefulSet access
-  # If you don't need a headless service specifically for the StatefulSet,
-  # you might use the regular service name or adjust as needed.
-  serviceName: {{ include "helm-starter-chart.fullname" . }}
+  serviceName: {{ .Chart.Name }}-service
   template:
     metadata:
       labels:
+        app: {{ .Chart.Name }}
         {{- include "helm-starter-chart.selectorLabels" . | nindent 8 }}
-      # Optional: Add annotations from values if needed
-      # {{- with .Values.podAnnotations }}
-      # annotations:
-      #   {{- toYaml . | nindent 8 }}
-      # {{- end }}
     spec:
-      # Optional: Add imagePullSecrets from values if needed
-      # {{- with .Values.imagePullSecrets }}
-      # imagePullSecrets:
-      #   {{- toYaml . | nindent 8 }}
-      # {{- end }}
-      # Optional: Add serviceAccountName from values if needed
-      # serviceAccountName: {{ include "helm-starter-chart.serviceAccountName" . }}
-      # Optional: Add securityContexts from values if needed
-      # securityContext:
-      #   {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Values.appName | default .Chart.Name }}
-          # Optional: Add container securityContext from values if needed
-          # securityContext:
-          #   {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          env:
-            {{- range $key, $val := .Values.env }}
-            - name: {{ $key }}
-              value: {{ $val | quote }}
-            {{- end }}
-            # Optional: Add envFrom from values if needed
-            # {{- with .Values.envFrom }}
-            # envFrom:
-            #   {{- toYaml . | nindent 12 }}
-            # {{- end }}
-          ports:
-            {{- range .Values.service.ports }}
-            - name: {{ .name }}
-              containerPort: {{ .targetPort }}
-              protocol: {{ .protocol }}
-            {{- end }}
-          volumeMounts:
-            {{- if .Values.persistence.config.enabled }}
-            - name: config
-              mountPath: {{ .Values.persistence.config.mountPath }}
-            {{- end }}
-            {{- range .Values.persistence.shared }}
-            {{- if .enabled }}
-            - name: {{ .name }}
-              mountPath: {{ .mountPath }}
-              {{- if .subPath }}
-              subPath: {{ .subPath }}
-              {{- end }}
-              readOnly: {{ .readOnly | default false }}
-            {{- end }}
-            {{- end }}
-          # Optional: Add probes from values if needed
-          # livenessProbe:
-          #   {{- toYaml .Values.livenessProbe | nindent 12 }}
-          # readinessProbe:
-          #   {{- toYaml .Values.readinessProbe | nindent 12 }}
-          # Optional: Add resources from values if needed
-          # resources:
-          #   {{- toYaml .Values.resources | nindent 12 }}
-      volumes:
-        # Mount existing shared PVCs defined in values.yaml
-        {{- range .Values.persistence.shared }}
-        {{- if .enabled }}
-        - name: {{ .name }}
-          persistentVolumeClaim:
-            claimName: {{ .existingClaim }}
-            readOnly: {{ .readOnly | default false }}
-        {{- end }}
-        {{- end }}
-      {{- with .Values.nodeSelector }}
+      - image: {{ .Values.statefulset.app.image.repository }}:{{ .Values.statefulset.app.image.tag | default .Chart.AppVersion }}
+        name: {{ .Chart.Name }}
+        ports:
+        - containerPort: {{ .Values.service.ports | first | get "targetPort" }}
+          name: {{ .Chart.Name }}
+        volumeMounts:
+        - mountPath: /config
+          name: {{ .Chart.Name }}-config
+        - mountPath: /mnt/
+          name: media-pv-data
       nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-  {{- if .Values.persistence.config.enabled }}
-  volumeClaimTemplates:
-    - metadata:
-        name: config
-        # Optional: Add annotations from values if needed
-        # annotations:
-        #   {{- toYaml .Values.persistence.config.annotations | nindent 10 }}
-      spec:
-        accessModes:
-        {{- range .Values.persistence.config.accessModes }}
-          - {{ . | quote }}
-        {{- end }}
-        resources:
-          requests:
-            storage: {{ .Values.persistence.config.size | quote }}
-        {{- if .Values.persistence.config.storageClassName }}
-        {{- if (eq "-" .Values.persistence.config.storageClassName) }}
-        storageClassName: ""
-        {{- else }}
-        storageClassName: {{ .Values.persistence.config.storageClassName }}
-        {{- end }}
-        {{- end }}
-  {{- end }}
+        app: {{ .Values.statefulset.app.nodeSelector.app }}
+      terminationGracePeriodSeconds: 10
+      volumes:
+      - name: {{ .Chart.Name }}-config
+        persistentVolumeClaim:
+           claimName: {{ .Chart.Name }}-config
+      - name: media-pv-data
+        persistentVolumeClaim:
+          claimName: media-pv-pvc-claim
