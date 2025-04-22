@@ -27,7 +27,7 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: sonarr-config
-        - mountPath: /mnt/
+        - mountPath: /data # Changed mount point for shared media volume
           name: media-pv-data
       nodeSelector:
         app: {{ .Values.statefulset.sonarr.nodeSelector.app }}

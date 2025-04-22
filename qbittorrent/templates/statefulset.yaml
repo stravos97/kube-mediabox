@@ -29,7 +29,7 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: {{ .Chart.Name }}-config
-        - mountPath: /mnt/
+        - mountPath: /data # Changed mount point for shared media volume
           name: media-pv-data
 
       # Gluetun sidecar container (conditionally included)
