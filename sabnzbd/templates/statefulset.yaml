@@ -27,7 +27,7 @@ spec:
         volumeMounts:
         - mountPath: /config
           name: sabnzbd-config
-        - mountPath: /data # Changed mount point for shared media volume
+        - mountPath: /mnt/ # Reverted mount point for shared media volume
           name: media-pv-data
       nodeSelector:
         app: mediabox
