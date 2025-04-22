@@ -6,6 +6,9 @@ statefulset:
       repository: ""
       tag: latest
   replicas: 1
+persistentVolumeClaim:
+  storage: 2Gi
+  storageClass: longhorn
 service:
   ports:
   - port: 8080 # Default port, should be updated for specific app

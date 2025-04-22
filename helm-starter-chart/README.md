@@ -26,6 +26,7 @@ This is a Helm starter chart designed to scaffold new applications for a media s
    * **Required:** Rename the `app` key under `statefulset` to match your application name (e.g., change `app` to `radarr`, `sonarr`, etc.)
    * **Required:** Set `statefulset.<app-name>.image.repository` and `statefulset.<app-name>.image.tag` to point to the container image for your application
    * **Adjust Service:** Modify `service.ports` with the correct port for your application
+   * **Configure PVC:** Adjust `persistentVolumeClaim.storage` and `persistentVolumeClaim.storageClass` if needed
    * **Optional Ingress:** If you need an Ingress resource, set `ingress.enabled: true` and configure `ingress.rules.host` with your desired hostname
 
 5. **Edit the template files if needed:**
@@ -56,6 +57,9 @@ statefulset:
       repository: lscr.io/linuxserver/myapp
       tag: latest
   replicas: 1
+persistentVolumeClaim:
+  storage: 2Gi  # Adjust storage size as needed
+  storageClass: longhorn  # Use appropriate storage class for your cluster
 service:
   ports:
   - port: 8080  # Replace with your app's port
