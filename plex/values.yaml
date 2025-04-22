@@ -10,7 +10,7 @@ statefulset:
         uid: 911
         gid: 911
         umask: 022
-        timezone: Europe/Berlin
+        timezone: Europe/London
     volumes:
       transcodePath: /mnt/local/transcode
       mediaPath: /mnt/unionfs/Media

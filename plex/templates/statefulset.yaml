@@ -30,6 +30,8 @@ spec:
           value: "{{ .Values.statefulset.spec.containers.env.umask }}"
         - name: TZ
           value: {{ .Values.statefulset.spec.containers.env.timezone }}
+        - name: PLEX_CLAIM
+          value: "claim-gCfet5An5Sg89PeEWyKS" # Use the new claim token directly
         image: {{ .Values.statefulset.plexServer.image.repository }}:{{ .Values.statefulset.plexServer.image.tag
           | default .Chart.AppVersion }}
         imagePullPolicy: IfNotPresent
@@ -48,7 +50,7 @@ spec:
         - mountPath: /transcode
           name: plex-transcode
         - mountPath: /data
-          name: media
+          name: media-pv-data # Changed volume name reference
       hostNetwork: true
       nodeSelector:
         app: {{ .Values.statefulset.spec.nodeSelector.app }}
@@ -59,6 +61,6 @@ spec:
       - name: plex-transcode
         hostPath:
           path: {{ .Values.statefulset.spec.volumes.transcodePath }}
-      - name: media
-        hostPath:
-          path: {{ .Values.statefulset.spec.volumes.mediaPath }}
+      - name: media-pv-data # Added shared media volume definition
+        persistentVolumeClaim:
+          claimName: media-pv-pvc-claim

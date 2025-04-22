@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "plex.fullname" . }}-service
+  labels:
+  {{- include "plex.labels" . | nindent 4 }}
+spec:
+  type: LoadBalancer
+  # Use Local policy to preserve source IP and ensure traffic goes to a node with the pod
+  # Important when using hostNetwork: true
+  externalTrafficPolicy: Local
+  selector:
+    # Selects the pods based on the label found in the StatefulSet
+    name: plex-server
+  ports:
+    - name: plex-main
+      protocol: TCP
+      port: 32400
+      targetPort: 32400
+    # Add other Plex ports if needed, e.g.:
+    # - name: plex-dlna-tcp
+    #   protocol: TCP
+    #   port: 32469
+    #   targetPort: 32469
+    # - name: plex-dlna-udp
+    #   protocol: UDP
+    #   port: 1900
+    #   targetPort: 1900
+    # - name: plex-discovery-1
+    #   protocol: UDP
+    #   port: 5353
+    #   targetPort: 5353
+    # - name: plex-discovery-2
+    #   protocol: TCP
+    #   port: 8324
+    #   targetPort: 8324
+    # - name: plex-discovery-3
+    #   protocol: UDP
+    #   port: 32410
+    #   targetPort: 32410
+    # - name: plex-discovery-4
+    #   protocol: UDP
+    #   port: 32412
+    #   targetPort: 32412
+    # - name: plex-discovery-5
+    #   protocol: UDP
+    #   port: 32413
+    #   targetPort: 32413
+    # - name: plex-discovery-6
+    #   protocol: UDP
+    #   port: 32414
+    #   targetPort: 32414
