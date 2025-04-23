@@ -3,11 +3,11 @@ kind: Service
 metadata:
   name: {{ include "ombi.fullname" . }}-service
   labels:
-  {{- include "ombi.labels" . | nindent 4 }}
+    {{- include "ombi.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   selector:
     app: ombi
-  {{- include "ombi.selectorLabels" . | nindent 4 }}
+    {{- include "ombi.selectorLabels" . | nindent 4 }}
   ports:
-	{{- .Values.service.ports | toYaml | nindent 2 -}}
+    {{- .Values.service.ports | toYaml | nindent 4 }}

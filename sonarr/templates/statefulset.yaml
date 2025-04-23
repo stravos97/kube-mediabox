@@ -4,7 +4,7 @@ metadata:
   name: {{ include "sonarr.fullname" . }}-statefulset
   labels:
     app: sonarr
-  {{- include "sonarr.labels" . | nindent 4 }}
+    {{- include "sonarr.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.statefulset.replicas }}
   selector:
@@ -19,23 +19,23 @@ spec:
         {{- include "sonarr.selectorLabels" . | nindent 8 }}
     spec:
       containers:
-      - image: {{ .Values.statefulset.sonarr.image.repository }}:{{ .Values.statefulset.sonarr.image.tag | default .Chart.AppVersion }}
-        name: sonarr
-        ports:
-        - containerPort: 8989
+        - image: {{ .Values.statefulset.sonarr.image.repository }}:{{ .Values.statefulset.sonarr.image.tag | default .Chart.AppVersion }}
           name: sonarr
-        volumeMounts:
-        - mountPath: /config
-          name: sonarr-config
-        - mountPath: /mnt/ # Reverted mount point for shared media volume
-          name: media-pv-data
+          ports:
+            - containerPort: 8989
+              name: sonarr
+          volumeMounts:
+            - mountPath: /config
+              name: sonarr-config
+            - mountPath: /mnt/
+              name: media-pv-data
       nodeSelector:
         app: {{ .Values.statefulset.sonarr.nodeSelector.app }}
       terminationGracePeriodSeconds: 10
       volumes:
-      - name: sonarr-config
-        persistentVolumeClaim:
-           claimName: sonarr-config
-      - name: media-pv-data
-        persistentVolumeClaim:
-          claimName: media-pv-pvc-claim
+        - name: sonarr-config
+          persistentVolumeClaim:
+            claimName: sonarr-config
+        - name: media-pv-data
+          persistentVolumeClaim:
+            claimName: media-pv-pvc-claim

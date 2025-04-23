@@ -3,11 +3,11 @@ kind: Service
 metadata:
   name: {{ include "gluetun.fullname" . }}-service
   labels:
-  {{- include "gluetun.labels" . | nindent 4 }}
+    {{- include "gluetun.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   selector:
     app: {{ .Chart.Name }}
-  {{- include "gluetun.selectorLabels" . | nindent 4 }}
+    {{- include "gluetun.selectorLabels" . | nindent 4 }}
   ports:
-  {{- .Values.service.ports | toYaml | nindent 2 -}}
+    {{- .Values.service.ports | toYaml | nindent 4 }}

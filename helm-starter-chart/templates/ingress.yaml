@@ -4,7 +4,7 @@ kind: Ingress
 metadata:
   name: {{ include "helm-starter-chart.fullname" . }}-ingress
   labels:
-  {{- include "helm-starter-chart.labels" . | nindent 4 }}
+    {{- include "helm-starter-chart.labels" . | nindent 4 }}
   annotations:
     cert-manager.io/issuer: letsencrypt-prod
     kubernetes.io/ingress.class: nginx
@@ -14,13 +14,13 @@ metadata:
     nginx.org/proxy-read-timeout: 600s
 spec:
   rules:
-  - host: {{ .Values.ingress.rules.host }} 
-    http:
-      paths:
-      - backend:
-          service:
-            name: {{ .Chart.Name }}-service
-            port:
-              number: {{ .Values.service.ports | first | get "port" }}
-        pathType: ImplementationSpecific
+    - host: {{ .Values.ingress.rules.host }} 
+      http:
+        paths:
+          - backend:
+              service:
+                name: {{ .Chart.Name }}-service
+                port:
+                  number: {{ .Values.service.ports | first | get "port" }}
+            pathType: ImplementationSpecific
 {{- end }}

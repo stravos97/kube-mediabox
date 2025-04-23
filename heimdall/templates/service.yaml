@@ -4,11 +4,11 @@ metadata:
   name: {{ include "heimdall.fullname" . }}-service
   labels:
     app: heimdall
-  {{- include "heimdall.labels" . | nindent 4 }}
+    {{- include "heimdall.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   selector:
     app: heimdall
-  {{- include "heimdall.selectorLabels" . | nindent 4 }}
+    {{- include "heimdall.selectorLabels" . | nindent 4 }}
   ports:
-	{{- .Values.service.ports | toYaml | nindent 2 -}}
+    {{- .Values.service.ports | toYaml | nindent 4 }}

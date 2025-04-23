@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: radarr-config # Changed from lidarr-config
+  name: radarr-config
   labels:
-    app: radarr # Changed from lidarr
-  {{- include "radarr.labels" . | nindent 4 }} # Changed from lidarr.labels
+    app: radarr
+    {{- include "radarr.labels" . | nindent 4 }}
 spec:
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   resources:
     requests:
-      storage: 5Gi # Kept the same size as Lidarr's example
-  storageClassName: {{ .Values.persistentVolumeClaim.storageClass }} # Use value from values.yaml
+      storage: 5Gi
+  storageClassName: {{ .Values.persistentVolumeClaim.storageClass }}

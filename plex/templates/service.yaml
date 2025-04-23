@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: {{ include "plex.fullname" . }}-service
   labels:
-  {{- include "plex.labels" . | nindent 4 }}
+    {{- include "plex.labels" . | nindent 4 }}
 spec:
   type: ClusterIP
   # Use Local policy to preserve source IP and ensure traffic goes to a node with the pod

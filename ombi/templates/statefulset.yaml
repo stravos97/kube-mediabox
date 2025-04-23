@@ -19,17 +19,16 @@ spec:
         {{- include "ombi.selectorLabels" . | nindent 8 }}
     spec:
       containers:
-      - image: {{ .Values.statefulset.ombi.image.repository }}:{{ .Values.statefulset.ombi.image.tag
-          | default .Chart.AppVersion }}
-        name: ombi
-        ports:
-        - containerPort: 3579
+        - image: {{ .Values.statefulset.ombi.image.repository }}:{{ .Values.statefulset.ombi.image.tag | default .Chart.AppVersion }}
           name: ombi
-        volumeMounts:
-        - mountPath: /config
-          name: ombi-config
+          ports:
+            - containerPort: 3579
+              name: ombi
+          volumeMounts:
+            - mountPath: /config
+              name: ombi-config
       terminationGracePeriodSeconds: 10
       volumes:
-      - name: ombi-config
-        persistentVolumeClaim:
-          claimName: ombi-config
+        - name: ombi-config
+          persistentVolumeClaim:
+            claimName: ombi-config

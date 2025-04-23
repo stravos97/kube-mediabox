@@ -4,7 +4,7 @@ metadata:
   name: {{ include "helm-starter-chart.fullname" . }}-statefulset
   labels:
     app: {{ .Chart.Name }}
-  {{- include "helm-starter-chart.labels" . | nindent 4 }}
+    {{- include "helm-starter-chart.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.statefulset.replicas }}
   selector:
@@ -19,72 +19,72 @@ spec:
         {{- include "helm-starter-chart.selectorLabels" . | nindent 8 }}
     spec:
       containers:
-      # qBittorrent container - uses network from Gluetun sidecar
-      - image: {{ .Values.statefulset.qbittorrent.image.repository }}:{{ .Values.statefulset.qbittorrent.image.tag | default .Chart.AppVersion }}
-        name: {{ .Chart.Name }}
-        env:
-        - name: WEBUI_PORT
-          value: "8081" # Set the WebUI port via environment variable
-        # Ports are handled by the Gluetun sidecar
-        volumeMounts:
-        - mountPath: /config
-          name: {{ .Chart.Name }}-config
-        - mountPath: /mnt/ # Reverted mount point for shared media volume
-          name: media-pv-data
+        # qBittorrent container - uses network from Gluetun sidecar
+        - image: {{ .Values.statefulset.qbittorrent.image.repository }}:{{ .Values.statefulset.qbittorrent.image.tag | default .Chart.AppVersion }}
+          name: {{ .Chart.Name }}
+          env:
+            - name: WEBUI_PORT
+              value: "8081"
+          # Ports are handled by the Gluetun sidecar
+          volumeMounts:
+            - mountPath: /config
+              name: {{ .Chart.Name }}-config
+            - mountPath: /mnt/
+              name: media-pv-data
 
-      # Gluetun sidecar container (conditionally included)
-      {{- if .Values.statefulset.gluetunSidecar.enabled }}
-      - name: gluetun-sidecar
-        image: {{ .Values.statefulset.gluetunSidecar.image.repository }}:{{ .Values.statefulset.gluetunSidecar.image.tag | default "latest" }}
-        imagePullPolicy: IfNotPresent
-        securityContext:
-          capabilities:
-            add: ["NET_ADMIN"]
-        ports:
-          # Ports exposed by Gluetun, matching the service definition
-          - containerPort: 8081 # qBittorrent WebUI forwarded by Gluetun
-            name: webui
-          - containerPort: 6881 # qBittorrent torrent TCP forwarded by Gluetun
-            protocol: TCP
-            name: torrent-tcp
-          - containerPort: 6881 # qBittorrent torrent UDP forwarded by Gluetun
-            protocol: UDP
-            name: torrent-udp
-          - containerPort: 1080 # SOCKS5 proxy provided by Gluetun
-            protocol: TCP
-            name: socks5
-          # Add other Gluetun ports if needed (e.g., 8888 for Gluetun UI)
-          # - containerPort: 8888
-          #   name: gluetun-ui
-        env:
-        {{- range $key, $value := .Values.statefulset.gluetunSidecar.env }}
-        - name: {{ $key }}
-          value: {{ $value | quote }}
-        {{- end }}
-        {{- if .Values.statefulset.gluetunSidecar.secrets.existingSecret }}
-        envFrom:
-        - secretRef:
-            name: {{ .Values.statefulset.gluetunSidecar.secrets.existingSecret }}
-        {{- end }}
-        volumeMounts:
-          # Mount necessary volumes for Gluetun if needed (e.g., for custom configs)
-          # Example:
-          # - name: gluetun-config-vol
-          #   mountPath: /gluetun
-      {{- end }} # End of Gluetun sidecar definition
+        # Gluetun sidecar container (conditionally included)
+        {{- if .Values.statefulset.gluetunSidecar.enabled }}
+        - name: gluetun-sidecar
+          image: {{ .Values.statefulset.gluetunSidecar.image.repository }}:{{ .Values.statefulset.gluetunSidecar.image.tag | default "latest" }}
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            capabilities:
+              add: ["NET_ADMIN"]
+          ports:
+            # Ports exposed by Gluetun, matching the service definition
+            - containerPort: 8081 # qBittorrent WebUI forwarded by Gluetun
+              name: webui
+            - containerPort: 6881 # qBittorrent torrent TCP forwarded by Gluetun
+              protocol: TCP
+              name: torrent-tcp
+            - containerPort: 6881 # qBittorrent torrent UDP forwarded by Gluetun
+              protocol: UDP
+              name: torrent-udp
+            - containerPort: 1080 # SOCKS5 proxy provided by Gluetun
+              protocol: TCP
+              name: socks5
+            # Add other Gluetun ports if needed (e.g., 8888 for Gluetun UI)
+            # - containerPort: 8888
+            #   name: gluetun-ui
+          env:
+            {{- range $key, $value := .Values.statefulset.gluetunSidecar.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          {{- if .Values.statefulset.gluetunSidecar.secrets.existingSecret }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.statefulset.gluetunSidecar.secrets.existingSecret }}
+          {{- end }}
+          volumeMounts:
+            # Mount necessary volumes for Gluetun if needed (e.g., for custom configs)
+            # Example:
+            # - name: gluetun-config-vol
+            #   mountPath: /gluetun
+        {{- end }} # End of Gluetun sidecar definition
 
       nodeSelector:
         # Apply node selector to the whole pod
         app: {{ .Values.statefulset.qbittorrent.nodeSelector.app }}
       terminationGracePeriodSeconds: 10
       volumes:
-      - name: {{ .Chart.Name }}-config # Volume for qBittorrent config
-        persistentVolumeClaim:
-           claimName: {{ .Chart.Name }}-config
-      - name: media-pv-data # Shared media volume
-        persistentVolumeClaim:
-          claimName: media-pv-pvc-claim
-      # Add volumes for Gluetun if needed
-      # Example:
-      # - name: gluetun-config-vol
-      #   emptyDir: {} # Or use a PVC
+        - name: {{ .Chart.Name }}-config # Volume for qBittorrent config
+          persistentVolumeClaim:
+            claimName: {{ .Chart.Name }}-config
+        - name: media-pv-data # Shared media volume
+          persistentVolumeClaim:
+            claimName: media-pv-pvc-claim
+        # Add volumes for Gluetun if needed
+        # Example:
+        # - name: gluetun-config-vol
+        #   emptyDir: {} # Or use a PVC

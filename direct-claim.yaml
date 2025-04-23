@@ -6,7 +6,7 @@ metadata:
     "helm.sh/resource-policy": keep  # Ensures the PVC isn't deleted during upgrades/uninstalls
 spec:
   accessModes:
-  - ReadWriteMany  # Allows mounting by multiple pods simultaneously
+    - ReadWriteMany  # Allows mounting by multiple pods simultaneously
   resources:
     requests:
       storage: 400Gi

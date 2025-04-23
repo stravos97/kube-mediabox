@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: lidarr-config
+  name: ombi-config
   labels:
-    app: lidarr
-    {{- include "lidarr.labels" . | nindent 4 }}
+    app: ombi
+    {{- include "ombi.labels" . | nindent 4 }}
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 5Gi
+      storage: 2Gi
   storageClassName: longhorn

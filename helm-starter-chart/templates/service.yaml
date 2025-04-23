@@ -3,11 +3,11 @@ kind: Service
 metadata:
   name: {{ include "helm-starter-chart.fullname" . }}-service
   labels:
-  {{- include "helm-starter-chart.labels" . | nindent 4 }}
+    {{- include "helm-starter-chart.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   selector:
     app: {{ .Chart.Name }}
-  {{- include "helm-starter-chart.selectorLabels" . | nindent 4 }}
+    {{- include "helm-starter-chart.selectorLabels" . | nindent 4 }}
   ports:
-  {{- .Values.service.ports | toYaml | nindent 2 -}}
+    {{- .Values.service.ports | toYaml | nindent 4 }}

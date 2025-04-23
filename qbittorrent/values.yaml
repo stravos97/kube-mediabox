@@ -43,23 +43,23 @@ persistentVolumeClaim:
 service:
   # Service ports now target the Gluetun sidecar, which forwards them
   ports:
-  - name: webui
-    port: 8081 # qBittorrent Web UI port (exposed externally)
-    protocol: TCP
-    targetPort: 8081 # Target port on the Gluetun sidecar (which forwards to qBittorrent)
-  - name: torrent-tcp
-    port: 6883 # qBittorrent torrent traffic port (exposed externally)
-    protocol: TCP
-    targetPort: 6881 # Target port on the Gluetun sidecar
-  - name: torrent-udp
-    port: 6882 # qBittorrent torrent traffic port (exposed externally)
-    protocol: UDP
-    targetPort: 6881 # Target port on the Gluetun sidecar
-  # Add SOCKS5 proxy port if needed externally
-  # - name: socks5
-  #   port: 1080
-  #   protocol: TCP
-  #   targetPort: 1080
+    - name: webui
+      port: 8081 # qBittorrent Web UI port (exposed externally)
+      protocol: TCP
+      targetPort: 8081 # Target port on the Gluetun sidecar (which forwards to qBittorrent)
+    - name: torrent-tcp
+      port: 6883 # qBittorrent torrent traffic port (exposed externally)
+      protocol: TCP
+      targetPort: 6881 # Target port on the Gluetun sidecar
+    - name: torrent-udp
+      port: 6882 # qBittorrent torrent traffic port (exposed externally)
+      protocol: UDP
+      targetPort: 6881 # Target port on the Gluetun sidecar
+    # Add SOCKS5 proxy port if needed externally
+    # - name: socks5
+    #   port: 1080
+    #   protocol: TCP
+    #   targetPort: 1080
   type: ClusterIP
 
 ingress:

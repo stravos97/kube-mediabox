@@ -4,7 +4,7 @@ metadata:
   name: {{ include "lidarr.fullname" . }}-statefulset
   labels:
     app: lidarr
-  {{- include "lidarr.labels" . | nindent 4 }}
+    {{- include "lidarr.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.statefulset.replicas }}
   selector:
@@ -19,23 +19,23 @@ spec:
         {{- include "lidarr.selectorLabels" . | nindent 8 }}
     spec:
       containers:
-      - image: {{ .Values.statefulset.lidarr.image.repository }}:{{ .Values.statefulset.lidarr.image.tag | default .Chart.AppVersion }}
-        name: lidarr
-        ports:
-        - containerPort: 8686
+        - image: {{ .Values.statefulset.lidarr.image.repository }}:{{ .Values.statefulset.lidarr.image.tag | default .Chart.AppVersion }}
           name: lidarr
-        volumeMounts:
-        - mountPath: /config
-          name: lidarr-config
-        - mountPath: /mnt/ # Reverted mount point for shared media volume
-          name: media-pv-data
+          ports:
+            - containerPort: 8686
+              name: lidarr
+          volumeMounts:
+            - mountPath: /config
+              name: lidarr-config
+            - mountPath: /mnt/
+              name: media-pv-data
       nodeSelector:
         app: {{ .Values.statefulset.lidarr.nodeSelector.app }}
       terminationGracePeriodSeconds: 10
       volumes:
-      - name: lidarr-config
-        persistentVolumeClaim:
-           claimName: lidarr-config
-      - name: media-pv-data
-        persistentVolumeClaim:
-          claimName: media-pv-pvc-claim
+        - name: lidarr-config
+          persistentVolumeClaim:
+            claimName: lidarr-config
+        - name: media-pv-data
+          persistentVolumeClaim:
+            claimName: media-pv-pvc-claim

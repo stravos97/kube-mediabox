@@ -11,9 +11,9 @@ persistentVolumeClaim:
   storageClass: longhorn
 service:
   ports:
-  - port: 8080 # Default port, should be updated for specific app
-    protocol: TCP
-    targetPort: 8080 # Should match the port value
+    - port: 8080 # Default port, should be updated for specific app
+      protocol: TCP
+      targetPort: 8080 # Should match the port value
   type: LoadBalancer
 ingress:
   enabled: false

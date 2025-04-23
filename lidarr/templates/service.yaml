@@ -3,11 +3,11 @@ kind: Service
 metadata:
   name: {{ include "lidarr.fullname" . }}-service
   labels:
-  {{- include "lidarr.labels" . | nindent 4 }}
+    {{- include "lidarr.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   selector:
     app: lidarr
-  {{- include "lidarr.selectorLabels" . | nindent 4 }}
+    {{- include "lidarr.selectorLabels" . | nindent 4 }}
   ports:
-	{{- .Values.service.ports | toYaml | nindent 2 -}}
+    {{- .Values.service.ports | toYaml | nindent 4 }}

@@ -1,5 +1,5 @@
 statefulset:
-  gluetun: # Renamed from 'app' to 'gluetun'
+  gluetun:
     nodeSelector:
       app: mediabox
     image:
@@ -31,22 +31,22 @@ persistentVolumeClaim:
   storageClass: longhorn
 service:
   ports:
-  - port: 8888 # Gluetun UI port
-    protocol: TCP
-    targetPort: 8888
-    name: http-ui
-  - port: 1080 # SOCKS5 proxy port
-    protocol: TCP
-    targetPort: 1080
-    name: socks5
-  - port: 6881 # qBittorrent torrenting port (TCP)
-    protocol: TCP
-    targetPort: 6881
-    name: qbt-tcp
-  - port: 6881 # qBittorrent torrenting port (UDP)
-    protocol: UDP
-    targetPort: 6881
-    name: qbt-udp
+    - port: 8888 # Gluetun UI port
+      protocol: TCP
+      targetPort: 8888
+      name: http-ui
+    - port: 1080 # SOCKS5 proxy port
+      protocol: TCP
+      targetPort: 1080
+      name: socks5
+    - port: 6881 # qBittorrent torrenting port (TCP)
+      protocol: TCP
+      targetPort: 6881
+      name: qbt-tcp
+    - port: 6881 # qBittorrent torrenting port (UDP)
+      protocol: UDP
+      targetPort: 6881
+      name: qbt-udp
   type: ClusterIP
 ingress:
   enabled: false

@@ -6,9 +6,9 @@ statefulset:
   replicas: 1
 service:
   ports:
-  - port: 3579
-    protocol: TCP
-    targetPort: 3579
+    - port: 3579
+      protocol: TCP
+      targetPort: 3579
   type: ClusterIP
 ingress:
   rules:

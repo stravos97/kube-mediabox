@@ -3,11 +3,11 @@ kind: Service
 metadata:
   name: {{ include "sonarr.fullname" . }}-service
   labels:
-  {{- include "sonarr.labels" . | nindent 4 }}
+    {{- include "sonarr.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   selector:
     app: sonarr
-  {{- include "sonarr.selectorLabels" . | nindent 4 }}
+    {{- include "sonarr.selectorLabels" . | nindent 4 }}
   ports:
-	{{- .Values.service.ports | toYaml | nindent 2 -}}
+    {{- .Values.service.ports | toYaml | nindent 4 }}

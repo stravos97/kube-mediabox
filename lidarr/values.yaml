@@ -9,9 +9,9 @@ statefulset:
   replicas: 1
 service:
   ports:
-  - port: 8686 # Keep updated value
-    protocol: TCP
-    targetPort: 8686 # Add targetPort for clarity
+    - port: 8686 # Keep updated value
+      protocol: TCP
+      targetPort: 8686 # Add targetPort for clarity
   type: ClusterIP
 ingress: # Add for consistency
   enabled: false # Default to false, can be overridden

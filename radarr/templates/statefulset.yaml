@@ -4,7 +4,7 @@ metadata:
   name: {{ include "radarr.fullname" . }}-statefulset
   labels:
     app: radarr
-  {{- include "radarr.labels" . | nindent 4 }}
+    {{- include "radarr.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.statefulset.replicas }}
   selector:
@@ -19,32 +19,32 @@ spec:
         {{- include "radarr.selectorLabels" . | nindent 8 }}
     spec:
       containers:
-      - image: {{ .Values.statefulset.radarr.image.repository }}:{{ .Values.statefulset.radarr.image.tag | default .Chart.AppVersion }}
-        name: radarr
-        env:
-        - name: PUID
-          value: "{{ .Values.statefulset.radarr.env.PUID }}"
-        - name: PGID
-          value: "{{ .Values.statefulset.radarr.env.PGID }}"
-        - name: TZ
-          value: "{{ .Values.statefulset.radarr.env.TZ }}"
-        ports:
-        - containerPort: 7878
+        - image: {{ .Values.statefulset.radarr.image.repository }}:{{ .Values.statefulset.radarr.image.tag | default .Chart.AppVersion }}
           name: radarr
-        volumeMounts:
-        - mountPath: /config
-          name: radarr-config
-        - mountPath: /movies
-          name: media-pv-data
-        - mountPath: /downloads
-          name: media-pv-data
+          env:
+            - name: PUID
+              value: "{{ .Values.statefulset.radarr.env.PUID }}"
+            - name: PGID
+              value: "{{ .Values.statefulset.radarr.env.PGID }}"
+            - name: TZ
+              value: "{{ .Values.statefulset.radarr.env.TZ }}"
+          ports:
+            - containerPort: 7878
+              name: radarr
+          volumeMounts:
+            - mountPath: /config
+              name: radarr-config
+            - mountPath: /movies
+              name: media-pv-data
+            - mountPath: /downloads
+              name: media-pv-data
       nodeSelector:
         app: {{ .Values.statefulset.radarr.nodeSelector.app }}
       terminationGracePeriodSeconds: 10
       volumes:
-      - name: radarr-config
-        persistentVolumeClaim:
-           claimName: radarr-config
-      - name: media-pv-data
-        persistentVolumeClaim:
-          claimName: media-pv-pvc-claim
+        - name: radarr-config
+          persistentVolumeClaim:
+            claimName: radarr-config
+        - name: media-pv-data
+          persistentVolumeClaim:
+            claimName: media-pv-pvc-claim

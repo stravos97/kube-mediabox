@@ -19,17 +19,16 @@ spec:
         {{- include "heimdall.selectorLabels" . | nindent 8 }}
     spec:
       containers:
-      - image: {{ .Values.statefulset.heimdall.image.repository }}:{{ .Values.statefulset.heimdall.image.tag
-          | default .Chart.AppVersion }}
-        name: heimdall
-        ports:
-        - containerPort: 80
+        - image: {{ .Values.statefulset.heimdall.image.repository }}:{{ .Values.statefulset.heimdall.image.tag | default .Chart.AppVersion }}
           name: heimdall
-        volumeMounts:
-        - mountPath: /config
-          name: heimdall-config
+          ports:
+            - containerPort: 80
+              name: heimdall
+          volumeMounts:
+            - mountPath: /config
+              name: heimdall-config
       terminationGracePeriodSeconds: 10
       volumes:
-      - name: heimdall-config
-        persistentVolumeClaim:
-          claimName: heimdall-config
+        - name: heimdall-config
+          persistentVolumeClaim:
+            claimName: heimdall-config

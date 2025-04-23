@@ -11,13 +11,13 @@ metadata:
 spec:
   ingressClassName: traefik # Specify Traefik ingress class
   rules:
-  - host: {{ .Values.ingress.rules.host }}
-    http:
-      paths:
-      - backend:
-          service:
-            name: {{ .Chart.Name }}-service
-            port:
-              number: {{ (.Values.service.ports | first).port }} # Use dot notation
-        pathType: ImplementationSpecific
+    - host: {{ .Values.ingress.rules.host }}
+      http:
+        paths:
+          - backend:
+              service:
+                name: {{ .Chart.Name }}-service
+                port:
+                  number: {{ (.Values.service.ports | first).port }} # Use dot notation
+            pathType: ImplementationSpecific
 {{- end }}

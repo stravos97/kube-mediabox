@@ -4,7 +4,7 @@ metadata:
   name: {{ include "helm-starter-chart.fullname" . }}-statefulset
   labels:
     app: {{ .Chart.Name }}
-  {{- include "helm-starter-chart.labels" . | nindent 4 }}
+    {{- include "helm-starter-chart.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.statefulset.replicas }}
   selector:
@@ -19,23 +19,23 @@ spec:
         {{- include "helm-starter-chart.selectorLabels" . | nindent 8 }}
     spec:
       containers:
-      - image: {{ .Values.statefulset.app.image.repository }}:{{ .Values.statefulset.app.image.tag | default .Chart.AppVersion }}
-        name: {{ .Chart.Name }}
-        ports:
-        - containerPort: {{ .Values.service.ports | first | get "targetPort" }}
+        - image: {{ .Values.statefulset.app.image.repository }}:{{ .Values.statefulset.app.image.tag | default .Chart.AppVersion }}
           name: {{ .Chart.Name }}
-        volumeMounts:
-        - mountPath: /config
-          name: {{ .Chart.Name }}-config
-        - mountPath: /mnt/
-          name: media-pv-data
+          ports:
+            - containerPort: {{ .Values.service.ports | first | get "targetPort" }}
+              name: {{ .Chart.Name }}
+          volumeMounts:
+            - mountPath: /config
+              name: {{ .Chart.Name }}-config
+            - mountPath: /mnt/
+              name: media-pv-data
       nodeSelector:
         app: {{ .Values.statefulset.app.nodeSelector.app }}
       terminationGracePeriodSeconds: 10
       volumes:
-      - name: {{ .Chart.Name }}-config
-        persistentVolumeClaim:
-           claimName: {{ .Chart.Name }}-config
-      - name: media-pv-data
-        persistentVolumeClaim:
-          claimName: media-pv-pvc-claim
+        - name: {{ .Chart.Name }}-config
+          persistentVolumeClaim:
+            claimName: {{ .Chart.Name }}-config
+        - name: media-pv-data
+          persistentVolumeClaim:
+            claimName: media-pv-pvc-claim
