@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: longhorn-frontend-ingress
+  namespace: longhorn-system
+  annotations:
+    cert-manager.io/issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: 16m
+    nginx.org/client-max-body-size: "0"
+    nginx.org/proxy-connect-timeout: 600s
+    nginx.org/proxy-read-timeout: 600s
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: longhorn.mediabox.local
+    http:
+      paths:
+      - backend:
+          service:
+            name: longhorn-frontend
+            port:
+              number: 80
+        pathType: ImplementationSpecific
